@@ -33,8 +33,8 @@ if(listener.forwardX) {
 
 const pannerModel = 'HRTF';
 
-const innerCone = 40;
-const outerCone = 50;
+const innerCone = 360;
+const outerCone = 360;
 const outerGain = 0.4;
 
 const distanceModel = 'linear';
@@ -49,9 +49,9 @@ const positionX = posX;
 const positionY = posY;
 const positionZ = posZ;
 
-const orientationX = 0.0;
+const orientationX = -1.0;
 const orientationY = 0.0;
-const orientationZ = -1.0;
+const orientationZ = 0.0;
 
 // let's use the class method for creating our panner node and pass in all those parameters we've set.
 
@@ -107,11 +107,15 @@ const degreesY = (q * 180)/Math.PI;
 function moveBoombox(direction,value, prevMove) {
 	switch (direction) {
 		case 'ass':
-			tmp=Math.sin(value%360)*5
-			tmp2=Math.cos(value%360)*5
-			panner.positionZ.value = posZ + tmp;
-			panner.positionX.value = posX + tmp2;
-			console.log(panner.positionX.value)
+			degrees=value%360
+			tmpZ=Math.sin(degrees)*15
+			tmpX=Math.cos(degrees)*5
+			panner.positionZ.value = posZ + tmpZ;
+			panner.positionX.value = posX + tmpX;
+			
+			rotate=(degrees*50+270)%360
+			console.log(panner.positionZ.value)
+			transform.rotateY = rotate;
 		
 		case 'left':
 			if (transform.xAxis > leftBound) {
@@ -258,13 +262,12 @@ playButton.addEventListener('click', function() {
 		prev = (panner.positionX.value).toFixed(3)
 		*/
 		//console.log(count%360)
-		tmp=Math.sin(count%360)*5
-		//console.log(tmp)
+
 		count += 0.01
 		moveBoombox("ass",count)
 		
 	}
-		,50)
+		,30)
 
 
 	// check if context is in suspended state (autoplay policy)
