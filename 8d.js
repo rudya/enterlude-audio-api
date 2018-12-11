@@ -8,9 +8,9 @@ const audioCtx = new AudioContext();
 const listener = audioCtx.listener;
 
 // Let's set the position of our listener based on where our boombox is.
-const posX = 0;
-const posY = 0;
-const posZ = 0;
+const posX = 1000;
+const posY = 1000;
+const posZ = 1000;
 
 if(listener.positionX) {
   listener.positionX.value = posX;
@@ -35,23 +35,23 @@ const pannerModel = 'HRTF';
 
 const innerCone = 360;
 const outerCone = 360;
-const outerGain = 0.4;
+const outerGain = 0;
 
 const distanceModel = 'linear';
 
-const maxDistance = 20000;
+const maxDistance = 10000;
 
-const refDistance = 1;
+const refDistance = 10;
 
-const rollOff = 10;
+const rollOff = 1;
 
-const positionX = posX;
+const positionX = posX+10;
 const positionY = posY;
-const positionZ = posZ;
+const positionZ = posZ-10;
 
-const orientationX = -1.0;
+const orientationX = 0.0;
 const orientationY = 0.0;
-const orientationZ = 0.0;
+const orientationZ = 1.0;
 
 // let's use the class method for creating our panner node and pass in all those parameters we've set.
 
@@ -71,7 +71,6 @@ const panner = new PannerNode(audioCtx, {
 	coneOuterAngle: outerCone,
 	coneOuterGain: outerGain
 })
-console.log(document.querySelector('#move-controls'))
 
 const moveControls = document.querySelector('#move-controls').querySelectorAll('button');
 const boombox = document.querySelector('.boombox-body');
@@ -89,8 +88,8 @@ let transform = {
 // set up our bounds
 const topBound = -posY;
 const bottomBound = posY;
-const rightBound = posX;
-const leftBound = -posX;
+const rightBound =10;
+const leftBound = -10;
 const innerBound = 0.1;
 const outerBound = 1.5;
 
@@ -108,19 +107,24 @@ function moveBoombox(direction,value, prevMove) {
 	switch (direction) {
 		case 'ass':
 			degrees=value%360
-			tmpZ=Math.sin(degrees)*15
-			tmpX=Math.cos(degrees)*5
+			tmpZ=Math.sin(degrees.toFixed(2))*10
+			tmpX=Math.cos(degrees.toFixed(2))*10
 			panner.positionZ.value = posZ + tmpZ;
 			panner.positionX.value = posX + tmpX;
+			//panner.positionX.linearRampToValueAtTime(posX+tmpX, audioCtx.currentTime + .75)
+			//panner.positionZ.linearRampToValueAtTime(posZ+tmpZ, audioCtx.currentTime + .75)
+			console.log(panner.positionX.value,panner.positionY.value,panner.positionZ.value)
 			
-			rotate=(degrees*50+270)%360
-			console.log(panner.positionZ.value)
-			transform.rotateY = rotate;
-		
+			rotate=(degrees*50)%360
+			radians= rotate*Math.PI/180
+			z = panner.orientationZ.value*Math.cos(-radians) - panner.orientationX.value*Math.sin(-radians);
+		    x = panner.orientationZ.value*Math.sin(-radians) + panner.orientationX.value*Math.cos(-radians);
+			break;
 		case 'left':
 			if (transform.xAxis > leftBound) {
 				transform.xAxis -= 0.1;
-				panner.positionX.value -= 0.3;
+				panner.positionX.value -= 1;
+				console.log("left")
 			}
 		break;
 		case 'up':
@@ -132,7 +136,8 @@ function moveBoombox(direction,value, prevMove) {
 		case 'right':
 			if (transform.xAxis < rightBound) {
 				transform.xAxis += 0.1;
-				panner.positionX.value += 0.3;
+				panner.positionX.value += 1;
+				console.log("right")
 
 			}
 		break;
@@ -156,7 +161,7 @@ function moveBoombox(direction,value, prevMove) {
 		break;
 		case 'rotate-right':
 			transform.rotateY += degreesY;
-			console.log(transform.rotateY);
+			//console.log(transform.rotateY);
      	// 'left' is rotation about y-axis with negative angle increment
       z = panner.orientationZ.value*Math.cos(-q) - panner.orientationX.value*Math.sin(-q);
       x = panner.orientationZ.value*Math.sin(-q) + panner.orientationX.value*Math.cos(-q);
@@ -231,43 +236,26 @@ moveControls.forEach(function(el) {
 
 // BOOMBOX FUNCTIONALITY HERE ~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2
 const audioElement = document.querySelector('audio');
-audioElement.src = "carry_on.mp3";
+audioElement.src = "so_alive1.mp3";
 const track = audioCtx.createMediaElementSource(audioElement);
 
 const playButton = document.querySelector('.tape-controls-play');
 
 var toggle = true;
-var bound = 369
 var prev = 0 
 var count = 0
 // play pause audio
 playButton.addEventListener('click', function() {
 	console.log("playing")
-	console.log(leftBound,rightBound)
-	setInterval(function() {
-		/*if(toggle == true){
-			moveBoombox("left");
-		}
-		else{
-			moveBoombox("right");
-		}*/
+	setTimeout(function(){setInterval(function() {
+		
 
-
-		/*console.log((panner.positionX.value).toFixed(3), prev)
-		if((panner.positionX.value).toFixed(3) == prev){
-			toggle = !toggle
-			console.log(toggle)
-
-		}
-		prev = (panner.positionX.value).toFixed(3)
-		*/
-		//console.log(count%360)
-
-		count += 0.01
+		count += 0.3
 		moveBoombox("ass",count)
 		
 	}
-		,30)
+		,750)},15000)
+	
 
 
 	// check if context is in suspended state (autoplay policy)
@@ -325,11 +313,3 @@ powerButton.addEventListener('click', function() {
 	this.setAttribute( "aria-checked", state ? "false" : "true" );
 	console.log(audioCtx.state);
 }, false);
-
-function left(timer){
-	console.log(timer)
-	if (transform.xAxis > leftBound) {
-				transform.xAxis -= 5;
-				panner.positionX.value -= 0.1;
-			}
-}
