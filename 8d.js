@@ -33,9 +33,9 @@ if(listener.forwardX) {
 
 const pannerModel = 'HRTF';
 
-const innerCone = 360;
-const outerCone = 360;
-const outerGain = 0;
+const innerCone = 260;
+const outerCone = 300;
+const outerGain = 0.5;
 
 const distanceModel = 'linear';
 
@@ -43,15 +43,15 @@ const maxDistance = 10000;
 
 const refDistance = 10;
 
-const rollOff = 1;
+const rollOff = 10;
 
 const positionX = posX+10;
-const positionY = posY;
+const positionY = posY+1;
 const positionZ = posZ-10;
 
-const orientationX = 0.0;
+const orientationX = 1.0;
 const orientationY = 0.0;
-const orientationZ = 1.0;
+const orientationZ = 0.0;
 
 // let's use the class method for creating our panner node and pass in all those parameters we've set.
 
@@ -106,19 +106,26 @@ const degreesY = (q * 180)/Math.PI;
 function moveBoombox(direction,value, prevMove) {
 	switch (direction) {
 		case 'ass':
-			degrees=value%360
-			tmpZ=Math.sin(degrees.toFixed(2))*10
-			tmpX=Math.cos(degrees.toFixed(2))*10
+
+			degrees=value
+			rotate=(degrees*50)%360
+			radians= rotate*Math.PI/180
+			console.log(rotate)
+			tmpZ=Math.sin(radians)*10
+			tmpX=Math.cos(radians)*10
 			panner.positionZ.value = posZ + tmpZ;
 			panner.positionX.value = posX + tmpX;
 			//panner.positionX.linearRampToValueAtTime(posX+tmpX, audioCtx.currentTime + .75)
 			//panner.positionZ.linearRampToValueAtTime(posZ+tmpZ, audioCtx.currentTime + .75)
-			console.log(panner.positionX.value,panner.positionY.value,panner.positionZ.value)
+			
 			
 			rotate=(degrees*50)%360
 			radians= rotate*Math.PI/180
-			z = panner.orientationZ.value*Math.cos(-radians) - panner.orientationX.value*Math.sin(-radians);
-		    x = panner.orientationZ.value*Math.sin(-radians) + panner.orientationX.value*Math.cos(-radians);
+			z = Math.sin(radians);
+		    x = Math.cos(radians)
+		    console.log(panner.positionX.value,panner.positionY.value,panner.positionZ.value, x, z)
+		    panner.orientationX.value = x;
+      		panner.orientationZ.value = z;
 			break;
 		case 'left':
 			if (transform.xAxis > leftBound) {
@@ -236,7 +243,7 @@ moveControls.forEach(function(el) {
 
 // BOOMBOX FUNCTIONALITY HERE ~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2
 const audioElement = document.querySelector('audio');
-audioElement.src = "so_alive1.mp3";
+audioElement.src = "no_romance.wav";
 const track = audioCtx.createMediaElementSource(audioElement);
 
 const playButton = document.querySelector('.tape-controls-play');
@@ -254,7 +261,7 @@ playButton.addEventListener('click', function() {
 		moveBoombox("ass",count)
 		
 	}
-		,750)},15000)
+		,750)},0)
 	
 
 
