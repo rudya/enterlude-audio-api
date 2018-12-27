@@ -12,6 +12,8 @@ const posX = 1000;
 const posY = 1000;
 const posZ = 1000;
 
+var DIST = 1000;
+
 if(listener.positionX) {
   listener.positionX.value = posX;
 	listener.positionY.value = posY;
@@ -33,23 +35,23 @@ if(listener.forwardX) {
 
 const pannerModel = 'HRTF';
 
-const innerCone = 260;
-const outerCone = 300;
-const outerGain = 0.5;
+const innerCone = 30;
+const outerCone = 60;
+const outerGain = 0;
 
 const distanceModel = 'linear';
 
 const maxDistance = 10000;
 
-const refDistance = 10;
+const refDistance = 1000;
 
-const rollOff = 10;
+const rollOff = 10000;
 
-const positionX = posX+10;
+const positionX = posX+DIST;
 const positionY = posY+1;
-const positionZ = posZ-10;
+const positionZ = posZ;
 
-const orientationX = 1.0;
+const orientationX = -1.0;
 const orientationY = 0.0;
 const orientationZ = 0.0;
 
@@ -110,9 +112,10 @@ function moveBoombox(direction,value, prevMove) {
 			degrees=value
 			rotate=(degrees*50)%360
 			radians= rotate*Math.PI/180
-			console.log(rotate)
-			tmpZ=Math.sin(radians)*10
-			tmpX=Math.cos(radians)*10
+			//console.log(rotate)
+			tmpZ=Math.sin(-radians)*DIST
+			tmpX=Math.cos(radians)*DIST
+			//console.log(tmpZ)
 			panner.positionZ.value = posZ + tmpZ;
 			panner.positionX.value = posX + tmpX;
 			//panner.positionX.linearRampToValueAtTime(posX+tmpX, audioCtx.currentTime + .75)
@@ -122,7 +125,7 @@ function moveBoombox(direction,value, prevMove) {
 			rotate=(degrees*50)%360
 			radians= rotate*Math.PI/180
 			z = Math.sin(radians);
-		    x = Math.cos(radians)
+		    x = -Math.cos(radians)
 		    console.log(panner.positionX.value,panner.positionY.value,panner.positionZ.value, x, z)
 		    panner.orientationX.value = x;
       		panner.orientationZ.value = z;
@@ -164,6 +167,7 @@ function moveBoombox(direction,value, prevMove) {
 			if (transform.zAxis < outerBound) {
 				transform.zAxis += 0.01;
 				panner.positionZ.value += 20;
+				console.log("forward")
 			}
 		break;
 		case 'rotate-right':
